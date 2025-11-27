@@ -1,190 +1,3 @@
-# import os
-# from flask import Flask, request, jsonify
-# from flask_cors import CORS
-# from dotenv import load_dotenv
-
-# from database import Base, engine, SessionLocal
-# from models import Candidate, DocumentRequestLog
-# from utils.file_helpers import save_upload
-# from resume_parser import parse_resume
-# from ai_agent import extract_details_from_text, generate_document_request
-# from email_sender import send_email
-
-
-# load_dotenv()
-
-# app = Flask(__name__)
-# CORS(app)
-
-# # create DB tables if not exist
-# Base.metadata.create_all(bind=engine)
-
-
-# @app.route("/candidates/upload", methods=["POST"])
-# def upload_resume():
-#     db = SessionLocal()
-
-#     if "file" not in request.files:
-#         return jsonify({"error": "No resume file provided"}), 400
-
-#     file = request.files["file"]
-#     file_path = save_upload(file, "uploads/resumes")
-#     # import pdb;pdb.set_trace()
-#     extracted_text = parse_resume(file_path)
-
-#     ai_data = extract_details_from_text(extracted_text)
-
-#     candidate = Candidate(
-#         name=ai_data.get("name"),
-#         email=ai_data.get("email"),
-#         phone=ai_data.get("phone"),
-#         company=ai_data.get("company"),
-#         designation=ai_data.get("designation"),
-#         skills=str(ai_data.get("skills")),
-#         resume_file=file_path,
-#         extraction_status="completed"
-#     )
-
-#     db.add(candidate)
-#     db.commit()
-#     db.refresh(candidate)
-
-#     return jsonify({"id": candidate.id, "status": "uploaded"})
-
-
-# @app.route("/candidates", methods=["GET"])
-# def get_candidates():
-#     db = SessionLocal()
-#     records = db.query(Candidate).all()
-
-#     data = []
-#     for c in records:
-#         data.append({
-#             "id": c.id,
-#             "name": c.name,
-#             "email": c.email,
-#             "company": c.company,
-#             "extraction_status": c.extraction_status
-#         })
-
-#     return jsonify(data)
-
-
-# @app.route("/candidates/<int:candidate_id>", methods=["GET"])
-# def get_candidate_detail(candidate_id):
-#     db = SessionLocal()
-#     c = db.query(Candidate).filter(Candidate.id == candidate_id).first()
-
-#     if not c:
-#         return jsonify({"error": "Candidate not found"}), 404
-
-#     return jsonify({
-#         "id": c.id,
-#         "name": c.name,
-#         "email": c.email,
-#         "phone": c.phone,
-#         "company": c.company,
-#         "designation": c.designation,
-#         "skills": c.skills,
-#         "resume_file": c.resume_file,
-#         "pan_file": c.pan_file,
-#         "aadhaar_file": c.aadhaar_file
-#     })
-
-
-# @app.route("/candidates/<int:candidate_id>/request-documents", methods=["POST"])
-# def request_documents(candidate_id):
-#     db = SessionLocal()
-#     candidate = db.query(Candidate).filter(Candidate.id == candidate_id).first()
-
-#     if not candidate:
-#         return jsonify({"error": "Candidate not found"}), 404
-
-#     message = generate_document_request(candidate.name)
-#     email_sent = send_email(
-#         to_email=candidate.email,
-#         subject="Request for PAN & Aadhaar Verification",
-#         message=message
-#     )
-
-#     # store the generated message in DB
-#     log = DocumentRequestLog(
-#         candidate_id=candidate_id,
-#         message=message
-#     )
-#     db.add(log)
-#     db.commit()
-
-#     return jsonify({
-#         "candidate_id": candidate_id,
-#         "message": message,
-#         "email_sent": email_sent
-#     })
-
-# @app.route("/candidates/<int:candidate_id>/submit-documents", methods=["POST"])
-# def submit_documents(candidate_id):
-#     db = SessionLocal()
-#     c = db.query(Candidate).filter(Candidate.id == candidate_id).first()
-
-#     if not c:
-#         return jsonify({"error": "Candidate not found"}), 404
-
-#     pan_file = request.files.get("pan")
-#     aadhaar_file = request.files.get("aadhaar")
-
-#     if pan_file:
-#         c.pan_file = save_upload(pan_file, "uploads/documents")
-
-#     if aadhaar_file:
-#         c.aadhaar_file = save_upload(aadhaar_file, "uploads/documents")
-
-#     db.commit()
-
-#     return jsonify({"status": "documents_uploaded"})
-
-
-# @app.route("/", methods=["GET"])
-# def home():
-#     return {"message": "Resume AI Agent Backend Running"}
-
-
-# if __name__ == "__main__":
-#     app.run(debug=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 import os
 from flask import Flask, request, jsonify
@@ -199,59 +12,12 @@ from resume_parser import parse_resume
 from ai_agent import extract_details_from_text, generate_document_request
 from email_sender import send_email
 
-# env variables
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-# create tables (only if they don't exist)
 Base.metadata.create_all(bind=engine)
-
-
-# @app.route("/candidates/upload", methods=["POST"])
-# def upload_resume():
-#     """Handles resume upload and triggers AI extraction."""
-
-#     db = SessionLocal()
-
-#     file = request.files.get("file")
-#     if not file:
-#         return jsonify({"error": "No file received"}), 400
-
-#     # store file locally
-#     saved_path = save_upload(file, "uploads/resumes")
-
-#     # read + clean text from resume
-#     resume_text = parse_resume(saved_path)
-
-#     # extract fields from AI agent
-#     extracted = extract_details_from_text(resume_text) or {}
-
-#     new_item = Candidate(
-#         name=extracted.get("name"),
-#         email=extracted.get("email"),
-#         phone=extracted.get("phone"),
-#         company=extracted.get("company"),
-#         designation=extracted.get("designation"),
-#         skills=str(extracted.get("skills")),
-#         resume_file=saved_path,
-#         extraction_status="completed"
-#     )
-
-#     db.add(new_item)
-#     db.commit()
-#     db.refresh(new_item)
-
-#     return jsonify({"id": new_item.id, "status": "uploaded"})
-
-
-
-
-
-
-
-
 
 @app.route("/candidates/upload", methods=["POST"])
 def upload_resume():
@@ -260,14 +26,13 @@ def upload_resume():
     file = request.files.get("file")
     if not file:
         return jsonify({"error": "No file received"}), 400
-
+    # import pdb;pdb.set_trace()
     saved_path = save_upload(file, "uploads/resumes")
     resume_text = parse_resume(saved_path)
 
     extracted = extract_details_from_text(resume_text) or {}
     email = extracted.get("email")
 
-    # if we couldn't detect an email, just make a new entry
     if not email:
         new_item = Candidate(
             name=extracted.get("name"),
@@ -284,11 +49,9 @@ def upload_resume():
         db.refresh(new_item)
         return jsonify({"id": new_item.id, "status": "uploaded"})
 
-    # check if candidate already exists
     existing = db.query(Candidate).filter(Candidate.email == email).first()
 
     if existing:
-        # update fields
         existing.name = extracted.get("name")
         existing.phone = extracted.get("phone")
         existing.company = extracted.get("company")
@@ -300,7 +63,6 @@ def upload_resume():
         db.commit()
         return jsonify({"id": existing.id, "status": "updated_existing"})
 
-    # otherwise create new one
     new_item = Candidate(
         name=extracted.get("name"),
         email=email,
@@ -377,7 +139,6 @@ def request_docs(cand_id):
         message=email_msg
     )
 
-    # store message for logs
     entry = DocumentRequestLog(candidate_id=cand_id, message=email_msg)
     db.add(entry)
     db.commit()

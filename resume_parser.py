@@ -1,52 +1,3 @@
-# import pdfplumber
-# import docx
-# from utils.text_cleaner import clean_text
-
-# def extract_text_from_pdf(path):
-#     try:
-#         content = ""
-#         with pdfplumber.open(path) as pdf:
-#             for page in pdf.pages:
-#                 content += page.extract_text() + "\n"
-#         return clean_text(content)
-#     except:
-#         return ""
-
-# def extract_text_from_docx(path):
-#     try:
-#         doc = docx.Document(path)
-#         content = "\n".join([p.text for p in doc.paragraphs])
-#         return clean_text(content)
-#     except:
-#         return ""
-
-# def parse_resume(path):
-#     if path.lower().endswith(".pdf"):
-#         return extract_text_from_pdf(path)
-#     if path.lower().endswith(".docx"):
-#         return extract_text_from_docx(path)
-#     return ""
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 import pdfplumber
 import docx
@@ -92,5 +43,4 @@ def parse_resume(path):
     if low.endswith(".docx"):
         return _read_docx(path)
 
-    # unsupported formats
     return ""

@@ -1,0 +1,11 @@
+flask
+flask-cors
+python-dotenv
+sqlalchemy
+pydantic
+requests
+python-docx
+pdfplumber
+werkzeug
+psycopg2-binary
+

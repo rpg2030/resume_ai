@@ -138,7 +138,7 @@ def _call_model(prompt_text):
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
         "X-Title": "resume-agent",
-        "Referer": "http://localhost"
+        # "Referer": "http://localhost"
     }
 
     body = {

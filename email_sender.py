@@ -35,7 +35,7 @@ def send_email(to_email, subject, message):
         smtp.sendmail(SMTP_EMAIL, to_email, mail.as_string())
         smtp.quit()
 
-        print(f"[MAIL] sent ::::::::::::::::::::::::::: {to_email}")
+        print(f"[MAIL] sent → {to_email}")
         return True
 
     except Exception as err:

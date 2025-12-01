@@ -9,4 +9,8 @@ pdfplumber
 werkzeug
 psycopg2-binary
 gunicorn
-
+pillow 
+pytesseract
+easyocr
+PyJWT
+pdf2image
